@@ -1,0 +1,242 @@
+<!--
+
+    BB3 Connection config node
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-connection", {
+        category: "config",
+        defaults: {
+            name: { value: "" },
+            host: { value: "localhost", required: true },
+            port: {
+                value: 1234,
+                required: true,
+                validate: RED.validators.number(),
+            },
+        },
+        label: function () {
+            return this.name || (this.host + ":" + this.port);
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-connection">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-bookmark"></i> Host</label>
+        <input type="text" id="node-config-input-host" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-bookmark"></i> Port</label>
+        <input type="text" id="node-config-input-port" />
+    </div>
+</script>
+
+<!--
+
+    BB3 Command node
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-command", {
+        category: "bb3",
+        color: "#3FADB5",
+        defaults: {
+            name: { value: "" },
+            connection: { value: "", type: "bb3-connection", required: true },
+            command: { value: "", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-arrow-circle-right",
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+
+            if (this.command) {
+                var connection = RED.nodes.node(this.connection);
+                if (connection) {
+                    return `[${connection.name}] ${this.command}`;
+                }
+                return this.command;
+            }
+
+            return "bb3-command";
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-command">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
+        <input type="text" id="node-input-connection" placeholder="Connection" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-command"><i class="fa fa-tag"></i> Command</label>
+        <input type="text" id="node-input-command" placeholder="Command" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="bb3-command">
+    <p>Send command to BB3</p>
+</script>
+
+<!--
+
+    BB3 Query node
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-query", {
+        category: "bb3",
+        color: "#87A980",
+        defaults: {
+            name: { value: "" },
+            connection: { value: "", type: "bb3-connection", required: true },
+            query: { value: "", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-question",
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+
+            if (this.query) {
+                var connection = RED.nodes.node(this.connection);
+                if (connection) {
+                    return `[${connection.name}] ${this.query}`;
+                }
+                return this.query;
+            }
+
+            return "bb3-query";
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-query">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
+        <input type="text" id="node-input-connection" placeholder="Connection" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-query"><i class="fa fa-tag"></i> Query</label>
+        <input type="text" id="node-input-query" placeholder="Query" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="bb3-query">
+    <p>Ask query from BB3 and wait for the result</p>
+</script>
+
+<!--
+
+    BB3 Connect node
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-connect", {
+        category: "bb3",
+        color: "#C7E9C0",
+        defaults: {
+            name: { value: "" },
+            connection: { value: "", type: "bb3-connection", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-question",
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+
+            var connection = RED.nodes.node(this.connection);
+            if (connection) {
+                return `Connect [${connection.name}]`;
+            }
+
+            return "bb3-query";
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-connect">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
+        <input type="text" id="node-input-connection" placeholder="Connection" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="bb3-connect">
+    <p>Connect to BB3</p>
+</script>
+
+<!--
+
+    BB3 Disconnect node
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-disconnect", {
+        category: "bb3",
+        color: "#FFAAAA",
+        defaults: {
+            name: { value: "" },
+            connection: { value: "", type: "bb3-connection", required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-question",
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+
+            var connection = RED.nodes.node(this.connection);
+            if (connection) {
+                return `Disconnect [${connection.name}]`;
+            }
+
+            return "bb3-disconnect";
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-disconnect">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
+        <input type="text" id="node-input-connection" placeholder="Connection" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="bb3-disconnect">
+    <p>Disconnect from BB3</p>
+</script>

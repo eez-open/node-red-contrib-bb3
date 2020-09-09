@@ -1,0 +1,25 @@
+{
+    "name"          : "node-red-contrib-bb3",
+    "version"       : "0.1.0",
+    "description"   : "Node-RED nodes to talk to BB3",
+    "dependencies"  : {
+        "serialport"   : "^9.0.1"
+    },
+    "repository" : {
+        "type":"git",
+        "url":"https://github.com/eez-open/node-red-contrib-bb3"
+    },
+    "license": "GPL-3.0-only",
+    "keywords": [ "node-red", "bb3" ],
+    "node-red": {
+        "version": ">=0.18.0",
+        "nodes": {
+            "bb3": "bb3.js"
+        }
+    },
+    "engines" : { "node" : ">=8.6.0" },
+    "author": "Envox <eez@envox.hr>",
+    "prettier": {
+        "printWidth": 160
+    }
+}
