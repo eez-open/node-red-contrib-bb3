@@ -57,6 +57,7 @@ module.exports = function (RED) {
         this.name = n.name;
         this.host = n.host;
         this.port = n.port;
+        this.autoConnect = n.autoConnect;
 
         let node = this;
 
@@ -408,10 +409,12 @@ module.exports = function (RED) {
 
         /////
 
-        stateTransition({
-            type: EVENT_TYPE_CONNECT
-        });
-        setReconnect();
+        if (node.autoConnect) {
+            stateTransition({
+                type: EVENT_TYPE_CONNECT
+            });
+            setReconnect();
+        }
     }
 
     RED.nodes.registerType("bb3-connection", ConnectionNode);

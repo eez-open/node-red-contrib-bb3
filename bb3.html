@@ -15,6 +15,9 @@
                 required: true,
                 validate: RED.validators.number(),
             },
+            autoConnect: {
+                value: false
+            }
         },
         label: function () {
             return this.name || (this.host + ":" + this.port);
@@ -28,12 +31,16 @@
         <input type="text" id="node-config-input-name" placeholder="Name" />
     </div>
     <div class="form-row">
-        <label for="node-config-input-host"><i class="fa fa-bookmark"></i> Host</label>
+        <label for="node-config-input-host">Host</label>
         <input type="text" id="node-config-input-host" />
     </div>
     <div class="form-row">
-        <label for="node-config-input-port"><i class="fa fa-bookmark"></i> Port</label>
+        <label for="node-config-input-port">Port</label>
         <input type="text" id="node-config-input-port" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-autoConnect">Auto connect</label>
+        <input type="checkbox" id="node-config-input-autoConnect" />
     </div>
 </script>
 
@@ -75,16 +82,16 @@
 
 <script type="text/html" data-template-name="bb3-command">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
+        <label for="node-input-connection">Connection</label>
         <input type="text" id="node-input-connection" placeholder="Connection" />
     </div>
     <div class="form-row">
-        <label for="node-input-command"><i class="fa fa-tag"></i> Command</label>
+        <label for="node-input-command">Command</label>
         <input type="text" id="node-input-command" placeholder="Command" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
     </div>
 </script>
 
@@ -130,16 +137,16 @@
 
 <script type="text/html" data-template-name="bb3-query">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
+        <label for="node-input-connection">Connection</label>
         <input type="text" id="node-input-connection" placeholder="Connection" />
     </div>
     <div class="form-row">
-        <label for="node-input-query"><i class="fa fa-tag"></i> Query</label>
+        <label for="node-input-query">Query</label>
         <input type="text" id="node-input-query" placeholder="Query" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
     </div>
 </script>
 
@@ -181,12 +188,12 @@
 
 <script type="text/html" data-template-name="bb3-connect">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-connection">Connection</label>
+        <input type="text" id="node-input-connection" placeholder="Connection" />
     </div>
     <div class="form-row">
-        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
-        <input type="text" id="node-input-connection" placeholder="Connection" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
     </div>
 </script>
 
@@ -228,12 +235,12 @@
 
 <script type="text/html" data-template-name="bb3-disconnect">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-connection">Connection</label>
+        <input type="text" id="node-input-connection" placeholder="Connection" />
     </div>
     <div class="form-row">
-        <label for="node-input-connection"><i class="fa fa-tag"></i> Connection</label>
-        <input type="text" id="node-input-connection" placeholder="Connection" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
     </div>
 </script>
 
