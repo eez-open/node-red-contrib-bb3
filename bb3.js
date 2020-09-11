@@ -27,27 +27,6 @@ module.exports = function (RED) {
     const EVENT_TYPE_ON_SOCKET_CLOSE = "on socket close";
     const EVENT_TYPE_ON_SOCKET_ERROR = "on socket error";
 
-    function makeCallback(msg, send, done) {
-        return function (err, result) {
-            if (err) {
-                if (done) {
-                    done(err);
-                } else {
-                    node.error(err, msg);
-                }
-            } else {
-                send = send || function() { node.send.apply(node,arguments) }
-
-                msg.payload = result;
-                send(msg);
-
-                if (done) {
-                    done();
-                }
-            }
-        }
-    }
-
     //
     // BB3 Connection config node
     //
@@ -63,13 +42,12 @@ module.exports = function (RED) {
 
         node.bb3EventEmitter = new events.EventEmitter();
 
-        /////
         let state = CONNECTION_STATE_IDLE;
         let stateCallback;
-
         let socket;
         let queryTimeout;
         let accData;
+        let reconnectIntervalHandle;
 
         function setState(newState, newStateCallback) {
             RED.log.info(`[${node.name}] state transition '${state}' => '${newState}'`);
@@ -93,8 +71,6 @@ module.exports = function (RED) {
 
             setState(CONNECTION_STATE_IDLE);
         }
-
-        let reconnectIntervalHandle;
 
         function setReconnect() {
             if (!reconnectIntervalHandle) {
@@ -416,8 +392,30 @@ module.exports = function (RED) {
             setReconnect();
         }
     }
-
     RED.nodes.registerType("bb3-connection", ConnectionNode);
+
+    //
+
+    function makeCallback(msg, send, done) {
+        return function (err, result) {
+            if (err) {
+                if (done) {
+                    done(err);
+                } else {
+                    node.error(err, msg);
+                }
+            } else {
+                send = send || function() { node.send.apply(node,arguments) }
+
+                msg.payload = result;
+                send(msg);
+
+                if (done) {
+                    done();
+                }
+            }
+        }
+    }
 
     //
     // BB3 Connect node
