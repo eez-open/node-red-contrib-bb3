@@ -9,7 +9,7 @@ module.exports = function (RED) {
     const RECONNECT_TIMEOUT = 1000;
     const QUERY_TIMEOUT = 3000;
 
-    const CONNECTION_STATE_IDLE = "idle";
+    const CONNECTION_STATE_DISCONNECTED = "disconnected";
     const CONNECTION_STATE_CONNECTING = "connecting";
     const CONNECTION_STATE_DISCONNECTING = "disconnecting";
     const CONNECTION_STATE_CONNECTED = "connected";
@@ -42,7 +42,7 @@ module.exports = function (RED) {
 
         node.bb3EventEmitter = new events.EventEmitter();
 
-        let state = CONNECTION_STATE_IDLE;
+        let state = CONNECTION_STATE_DISCONNECTED;
         let stateCallback;
         let socket;
         let queryTimeout;
@@ -69,13 +69,13 @@ module.exports = function (RED) {
                 stateCallback(null);
             }
 
-            setState(CONNECTION_STATE_IDLE);
+            setState(CONNECTION_STATE_DISCONNECTED);
         }
 
         function setReconnect() {
             if (!reconnectIntervalHandle) {
                 reconnectIntervalHandle = setInterval(function () {
-                    if (state == CONNECTION_STATE_IDLE) {
+                    if (state == CONNECTION_STATE_DISCONNECTED) {
                         stateTransition({
                             type: EVENT_TYPE_CONNECT
                         });
@@ -92,7 +92,7 @@ module.exports = function (RED) {
         }
 
         function stateTransition(event) {
-            if (state == CONNECTION_STATE_IDLE) {
+            if (state == CONNECTION_STATE_DISCONNECTED) {
                 if (event.type == EVENT_TYPE_CONNECT) {
                     setState(CONNECTION_STATE_CONNECTING);
 
@@ -157,7 +157,7 @@ module.exports = function (RED) {
                 }
 
                 if (event.type == EVENT_TYPE_ON_SOCKET_CLOSE) {
-                    setState(CONNECTION_STATE_IDLE);
+                    setState(CONNECTION_STATE_DISCONNECTED);
                     return;
                 }
             }
@@ -211,6 +211,7 @@ module.exports = function (RED) {
                     setState(CONNECTION_STATE_EXECUTING_QUERY, event.arg.callback);
                     socket.write(event.arg.query + "\n", 'utf8');
                     queryTimeout = setTimeout(function () {
+                        RED.log.error(`[${node.name}] query timeout`);
                         event.arg.callback("timeout");
                         setState(CONNECTION_STATE_CONNECTED);
                     }, QUERY_TIMEOUT);
@@ -434,7 +435,7 @@ module.exports = function (RED) {
 
         function onConnectionStateChange(arg) {
             node.status({
-                fill: arg.newState == CONNECTION_STATE_CONNECTED ? "green" : arg.newState != CONNECTION_STATE_IDLE ? "blue" : "red",
+                fill: arg.newState == CONNECTION_STATE_CONNECTED ? "green" : arg.newState != CONNECTION_STATE_DISCONNECTED ? "blue" : "red",
                 shape: "ring",
                 text: arg.newState
             });
