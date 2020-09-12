@@ -504,4 +504,49 @@ module.exports = function (RED) {
         });
     }
     RED.nodes.registerType("bb3-query", QueryNode);
+
+    //
+    // BB3 on-event
+    //
+
+    function OnEventNode(n) {
+        RED.nodes.createNode(this,n);
+
+        var node = this;
+
+        var handler = function (msg) {
+            node.send(msg);
+        }
+
+        var eventName;
+
+        this.on("input", function (msg) {
+            eventName = msg.eventName;
+            if (eventName) {
+                RED.events.on(eventName, handler);
+            }
+        });
+
+        this.on("close",function() {
+            if (eventName) {
+                RED.events.removeListener(eventName, handler);
+            }
+        });
+    }
+    RED.nodes.registerType("bb3-on-event", OnEventNode);
+
+    //
+    // BB3 emit-event
+    //
+
+    function EmitEventNode(n) {
+        RED.nodes.createNode(this,n);
+
+        this.on("input", function (msg) {
+            if (msg.eventName) {
+                RED.events.emit(msg.eventName, msg)
+            }
+        });
+    }
+    RED.nodes.registerType("bb3-emit-event", EmitEventNode);
 };

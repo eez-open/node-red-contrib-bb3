@@ -247,3 +247,70 @@
 <script type="text/html" data-help-name="bb3-disconnect">
     <p>Disconnect from BB3</p>
 </script>
+
+
+<!--
+
+    BB3 on-event
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-on-event", {
+        category: "bb3",
+        color: "#FFAAAA",
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "link-in.svg",
+        label: function () {
+            return "bb3-on-event";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-on-event">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="bb3-on-event">
+    <p>TODO ...</p>
+</script>
+
+<!--
+
+    BB3 emit-event
+
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType("bb3-emit-event", {
+        category: "bb3",
+        color: "#FFAAAA",
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 0,
+        icon: "link-out.svg",
+        label: function () {
+            return "bb3-emit-event";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="bb3-emit-event">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="bb3-emit-event">
+    <p>TODO ...</p>
+</script>
