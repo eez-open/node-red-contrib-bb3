@@ -68,10 +68,10 @@
             }
 
             if (this.command) {
-                var connection = RED.nodes.node(this.connection);
-                if (connection) {
-                    return `[${connection.name}] ${this.command}`;
-                }
+                // var connection = RED.nodes.node(this.connection);
+                // if (connection) {
+                //     return `[${connection.name}] ${this.command}`;
+                // }
                 return this.command;
             }
 
@@ -123,10 +123,10 @@
             }
 
             if (this.query) {
-                var connection = RED.nodes.node(this.connection);
-                if (connection) {
-                    return `[${connection.name}] ${this.query}`;
-                }
+                // var connection = RED.nodes.node(this.connection);
+                // if (connection) {
+                //     return `[${connection.name}] ${this.query}`;
+                // }
                 return this.query;
             }
 

@@ -40,7 +40,7 @@ module.exports = function (RED) {
 
         let node = this;
 
-        node.bb3EventEmitter = new events.EventEmitter();
+        node.bb3ConnectionEventEmitter = new events.EventEmitter();
 
         let state = CONNECTION_STATE_DISCONNECTED;
         let stateCallback;
@@ -51,7 +51,7 @@ module.exports = function (RED) {
 
         function setState(newState, newStateCallback) {
             RED.log.info(`[${node.name}] state transition '${state}' => '${newState}'`);
-            node.bb3EventEmitter.emit('state-change', {
+            node.bb3ConnectionEventEmitter.emit('state-change', {
                 oldState: state,
                 newState
             });
@@ -268,12 +268,14 @@ module.exports = function (RED) {
                             RED.log.error(`[${node.name}] error: '${data}'`);
                             accData = accData.substr(i + 2);
                         } else {
+                            RED.log.info(`[${node.name}] query result: "${data}"`);
                             let num = Number(data);
                             if (!isNaN(num)) {
-                                RED.log.info(`[${node.name}] query result: ${num}`);
                                 stateCallback(null, num);
                             } else {
-                                RED.log.info(`[${node.name}] query result: "${data}"`);
+                                if (data.length >= 2 && data.startsWith("\"") && data.endsWith("\"")) {
+                                    data = data.substr(1, data.length - 2);
+                                }
                                 stateCallback(null, data);
                             }
                             clearTimeout(queryTimeout);
@@ -360,12 +362,12 @@ module.exports = function (RED) {
         };
 
         node.bb3EmitState = function() {
-            node.bb3EventEmitter.emit('state-change', {
+            node.bb3ConnectionEventEmitter.emit('state-change', {
                 newState: ""
             });
 
             setTimeout(function () {
-                node.bb3EventEmitter.emit('state-change', {
+                node.bb3ConnectionEventEmitter.emit('state-change', {
                     newState: state
                 });
             }, 10)
@@ -441,11 +443,11 @@ module.exports = function (RED) {
             });
         }
 
-        node.connection.bb3EventEmitter.on('state-change', onConnectionStateChange);
+        node.connection.bb3ConnectionEventEmitter.on('state-change', onConnectionStateChange);
         node.connection.bb3EmitState();
 
         node.on("close", function (done) {
-            node.connection.bb3EventEmitter.off('state-change', onConnectionStateChange);
+            node.connection.bb3ConnectionEventEmitter.off('state-change', onConnectionStateChange);
             done();
         });
     }
@@ -509,6 +511,9 @@ module.exports = function (RED) {
     // BB3 on-event
     //
 
+    const bb3EventEmitter = new events.EventEmitter();
+    bb3EventEmitter.setMaxListeners(1000);
+
     function OnEventNode(n) {
         RED.nodes.createNode(this,n);
 
@@ -523,13 +528,13 @@ module.exports = function (RED) {
         this.on("input", function (msg) {
             eventName = msg.eventName;
             if (eventName) {
-                RED.events.on(eventName, handler);
+                bb3EventEmitter.on(eventName, handler);
             }
         });
 
         this.on("close",function() {
             if (eventName) {
-                RED.events.removeListener(eventName, handler);
+                bb3EventEmitter.removeListener(eventName, handler);
             }
         });
     }
@@ -544,7 +549,7 @@ module.exports = function (RED) {
 
         this.on("input", function (msg) {
             if (msg.eventName) {
-                RED.events.emit(msg.eventName, msg)
+                bb3EventEmitter.emit(msg.eventName, msg)
             }
         });
     }
