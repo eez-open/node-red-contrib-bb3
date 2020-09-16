@@ -268,14 +268,15 @@ module.exports = function (RED) {
                             RED.log.error(`[${node.name}] error: '${data}'`);
                             accData = accData.substr(i + 2);
                         } else {
-                            RED.log.info(`[${node.name}] query result: "${data}"`);
                             let num = Number(data);
                             if (!isNaN(num)) {
+                                RED.log.info(`[${node.name}] query result: ${num}`);
                                 stateCallback(null, num);
                             } else {
                                 if (data.length >= 2 && data.startsWith("\"") && data.endsWith("\"")) {
                                     data = data.substr(1, data.length - 2);
                                 }
+                                RED.log.info(`[${node.name}] query result: "${data}"`);
                                 stateCallback(null, data);
                             }
                             clearTimeout(queryTimeout);
