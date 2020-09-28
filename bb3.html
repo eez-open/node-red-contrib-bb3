@@ -21,7 +21,7 @@
         },
         label: function () {
             return this.name || (this.host + ":" + this.port);
-        },
+        }
     });
 </script>
 
@@ -57,7 +57,8 @@
         defaults: {
             name: { value: "" },
             connection: { value: "", type: "bb3-connection", required: true },
-            command: { value: "", required: true }
+            command: { value: "", required: true },
+            commandType: { value: "str" }
         },
         inputs: 1,
         outputs: 1,
@@ -77,6 +78,13 @@
 
             return "bb3-command";
         },
+        oneditprepare: function () {
+            $("#node-input-command").typedInput({
+                default:"str",
+                types: ["msg", "flow", "global", "str", "jsonata", "env"],
+                typeField: "#node-input-commandType"
+            })
+        }
     });
 </script>
 
@@ -87,7 +95,8 @@
     </div>
     <div class="form-row">
         <label for="node-input-command">Command</label>
-        <input type="text" id="node-input-command" placeholder="Command" />
+        <input type="text" id="node-input-command" />
+        <input type="hidden" id="node-input-commandType">
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -112,7 +121,8 @@
         defaults: {
             name: { value: "" },
             connection: { value: "", type: "bb3-connection", required: true },
-            query: { value: "", required: true }
+            query: { value: "", required: true },
+            queryType: { value: "str" }
         },
         inputs: 1,
         outputs: 1,
@@ -132,6 +142,13 @@
 
             return "bb3-query";
         },
+        oneditprepare: function () {
+            $("#node-input-query").typedInput({
+                default:"str",
+                types: ["msg", "flow", "global", "str", "jsonata", "env"],
+                typeField: "#node-input-queryType"
+            })
+        }
     });
 </script>
 
@@ -142,7 +159,8 @@
     </div>
     <div class="form-row">
         <label for="node-input-query">Query</label>
-        <input type="text" id="node-input-query" placeholder="Query" />
+        <input type="text" id="node-input-query">
+        <input type="hidden" id="node-input-queryType">
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>

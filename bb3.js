@@ -475,6 +475,19 @@ module.exports = function (RED) {
     // BB3 Command node
     //
 
+    function evalParam(node, msg, param, paramType) {
+        if (paramType == "str") {
+            return param;
+        }
+
+        if (paramType === "jsonata") {
+            let expr = RED.util.prepareJSONataExpression(param, node);
+            return RED.util.evaluateJSONataExpression(expr, msg);
+        }
+
+        return RED.util.evaluateNodeProperty(param, paramType, node, msg);
+    }
+
     function CommandNode(config) {
         RED.nodes.createNode(this, config);
 
@@ -482,9 +495,10 @@ module.exports = function (RED) {
 
         node.connection = RED.nodes.getNode(config.connection);
         node.command = config.command;
+        node.commandType = config.commandType;
 
         node.on("input", function (msg, send, done) {
-            node.connection.bb3ExecuteCommand(node.command, makeCallback(msg, send, done));
+            node.connection.bb3ExecuteCommand(evalParam(node, msg, node.command, node.commandType), makeCallback(msg, send, done));
         });
     }
 
@@ -501,9 +515,10 @@ module.exports = function (RED) {
 
         node.connection = RED.nodes.getNode(config.connection);
         node.query = config.query;
+        node.queryType = config.queryType || "str";
 
         node.on("input", function (msg, send, done) {
-            node.connection.bb3ExecuteQuery(node.query, makeCallback(msg, send, done));
+            node.connection.bb3ExecuteQuery(evalParam(node, msg, node.query, node.queryType), makeCallback(msg, send, done));
         });
     }
     RED.nodes.registerType("bb3-query", QueryNode);
