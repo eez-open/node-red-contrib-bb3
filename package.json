@@ -1,12 +1,12 @@
 {
-    "name"          : "node-red-contrib-bb3",
+    "name"          : "bb3-node-red-contrib",
     "version"       : "0.1.0",
     "description"   : "Node-RED nodes to talk to BB3",
     "dependencies"  : {
     },
     "repository" : {
         "type":"git",
-        "url":"https://github.com/eez-open/node-red-contrib-bb3"
+        "url":"https://github.com/eez-open/bb3-node-red-contrib"
     },
     "license": "GPL-3.0-only",
     "keywords": [ "node-red", "bb3" ],
@@ -20,5 +20,15 @@
     "author": "Envox <eez@envox.hr>",
     "prettier": {
         "printWidth": 160
+    },
+    "scripts": {
+        "publish": "npm publish --access public"
+    },
+    "bugs": {
+      "url": "https://github.com/eez-open/bb3-node-red-contrib/issues"
+    },
+    "homepage": "https://github.com/eez-open/bb3-node-red-contrib#readme",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/"
     }
 }
