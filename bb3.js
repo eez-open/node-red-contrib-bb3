@@ -530,8 +530,8 @@ module.exports = function (RED) {
     const bb3EventEmitter = new events.EventEmitter();
     bb3EventEmitter.setMaxListeners(1000);
 
-    function OnEventNode(n) {
-        RED.nodes.createNode(this,n);
+    function OnEventNode(config) {
+        RED.nodes.createNode(this, config);
 
         var node = this;
 
@@ -566,8 +566,8 @@ module.exports = function (RED) {
     // BB3 emit-event
     //
 
-    function EmitEventNode(n) {
-        RED.nodes.createNode(this,n);
+    function EmitEventNode(config) {
+        RED.nodes.createNode(this, config);
 
         var node = this;
 
