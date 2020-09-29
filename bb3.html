@@ -278,18 +278,40 @@
         category: "bb3",
         color: "#FFAAAA",
         defaults: {
-            name: { value: "" }
+            name: { value: "" },
+            eventName: { value: "", required: true },
+            eventNameType: { value: "str" }
         },
         inputs: 1,
         outputs: 1,
         icon: "link-in.svg",
         label: function () {
+            if (this.name) {
+                return this.name;
+            }
+
+            if (this.eventName) {
+                return this.eventName;
+            }
+
             return "bb3-on-event";
+        },
+        oneditprepare: function () {
+            $("#node-input-eventName").typedInput({
+                default:"str",
+                types: ["msg", "flow", "global", "str", "jsonata", "env"],
+                typeField: "#node-input-eventNameType"
+            })
         }
     });
 </script>
 
 <script type="text/html" data-template-name="bb3-on-event">
+    <div class="form-row">
+        <label for="node-input-command">Event name</label>
+        <input type="text" id="node-input-eventName" />
+        <input type="hidden" id="node-input-eventNameType">
+    </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name" />
@@ -311,18 +333,40 @@
         category: "bb3",
         color: "#FFAAAA",
         defaults: {
-            name: { value: "" }
+            name: { value: "" },
+            eventName: { value: "", required: true },
+            eventNameType: { value: "str" }
         },
         inputs: 1,
         outputs: 0,
         icon: "link-out.svg",
         label: function () {
+            if (this.name) {
+                return this.name;
+            }
+
+            if (this.eventName) {
+                return this.eventName;
+            }
+
             return "bb3-emit-event";
+        },
+        oneditprepare: function () {
+            $("#node-input-eventName").typedInput({
+                default:"str",
+                types: ["msg", "flow", "global", "str", "jsonata", "env"],
+                typeField: "#node-input-eventNameType"
+            })
         }
     });
 </script>
 
 <script type="text/html" data-template-name="bb3-emit-event">
+    <div class="form-row">
+        <label for="node-input-command">Event name</label>
+        <input type="text" id="node-input-eventName" />
+        <input type="hidden" id="node-input-eventNameType">
+    </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name" />

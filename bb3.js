@@ -535,6 +535,9 @@ module.exports = function (RED) {
 
         var node = this;
 
+        node.eventName = config.eventName;
+        node.eventNameType = config.eventNameType;
+
         var handler = function (msg) {
             node.send(msg);
         }
@@ -542,7 +545,10 @@ module.exports = function (RED) {
         var eventName;
 
         this.on("input", function (msg) {
-            eventName = msg.eventName;
+            if (eventName) {
+                bb3EventEmitter.removeListener(eventName, handler);
+            }
+            eventName = evalParam(node, msg, node.eventName, node.eventNameType);
             if (eventName) {
                 bb3EventEmitter.on(eventName, handler);
             }
@@ -563,9 +569,15 @@ module.exports = function (RED) {
     function EmitEventNode(n) {
         RED.nodes.createNode(this,n);
 
+        var node = this;
+
+        node.eventName = config.eventName;
+        node.eventNameType = config.eventNameType;
+
         this.on("input", function (msg) {
-            if (msg.eventName) {
-                bb3EventEmitter.emit(msg.eventName, msg)
+            const eventName = evalParam(node, msg, node.eventName, node.eventNameType);
+            if (eventName) {
+                bb3EventEmitter.emit(eventName, msg)
             }
         });
     }
