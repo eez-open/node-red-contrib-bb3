@@ -1,9 +1,8 @@
 {
     "name"          : "node-red-contrib-bb3",
-    "version"       : "0.3.0",
+    "version"       : "0.1.0",
     "description"   : "Node-RED nodes to talk to BB3",
     "dependencies"  : {
-        "serialport"   : "^9.0.1"
     },
     "repository" : {
         "type":"git",
@@ -21,5 +20,12 @@
     "author": "Envox <eez@envox.hr>",
     "prettier": {
         "printWidth": 160
-    }
+    },
+    "scripts": {
+        "publish": "npm publish --access public"
+    },
+    "bugs": {
+      "url": "https://github.com/eez-open/node-red-contrib-bb3/issues"
+    },
+    "homepage": "https://github.com/eez-open/node-red-contrib-bb3#readme"
 }
