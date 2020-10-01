@@ -1,6 +1,6 @@
 # node-red-contrib-bb3
 
-A [Node-RED](http://nodered.org) nodes to work with [BB3](https://www.envox.hr/eez/eez-bench-box-3/introduction.html).
+A [Node-RED](http://nodered.org) nodes to work with [EEZ BB3](https://www.envox.hr/eez/eez-bench-box-3/introduction.html).
 
 ## Install
 
@@ -11,10 +11,10 @@ To install - either use the manage palette option in the editor, or change to yo
 
 ## Features
 
-Supported BB3 related nodes:
+Supported EEZ BB3 related nodes:
 
-- `bb3-connect`: Connects to BB3 using TCP.
-- `bb3-disconnect`: Disconnects from BB3.
+- `bb3-connect`: Connects to EEZ BB3 using TCP.
+- `bb3-disconnect`: Disconnects from EEZ BB3.
 - `bb3-command`: Executes SCPI command.
 - `bb3-query`: Execute SCPI query.
 
