@@ -216,7 +216,18 @@
 </script>
 
 <script type="text/html" data-help-name="bb3-connect">
-    <p>Connects to BB3</p>
+    <p>
+        Connects to BB3.
+    </p>
+    <p>
+        Before using this node, <b>Connection</b> parameter must be selected.
+        You can create a new connection or use existing one.
+        When defining a new connection, bb3 <b>Host</b> name and SCPI <b>Port</b> (5025) must be defined.
+        Make sure host name can be resolved on the computer running Node-RED. If not, then manual editing of your hosts file could be required.
+    </p>
+    <p>
+        If you want to connect with BB3 automatically when Node-RED starts, then check <b>Auto connect</b> checkbox.
+    </p>
 </script>
 
 <!--
@@ -263,7 +274,7 @@
 </script>
 
 <script type="text/html" data-help-name="bb3-disconnect">
-    <p>Disconnects from BB3</p>
+    <p>Disconnects from BB3.</p>
 </script>
 
 

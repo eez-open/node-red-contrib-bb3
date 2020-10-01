@@ -21,6 +21,3 @@ Supported BB3 related nodes:
 Learn about supported SCPI commands and queries from here https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-introduction.html.
 
 Also, there are two nodes for simple event based communication inside Node-RED flows. You can emit events with `bb3-emit-event` and catch it with `bb3-on-event` from any node in your project.
-
-
-
