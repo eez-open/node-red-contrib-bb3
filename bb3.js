@@ -45,7 +45,7 @@ module.exports = function (RED) {
         let state = CONNECTION_STATE_DISCONNECTED;
         let stateCallback;
         let socket;
-        let queryTimeout;
+        let queryOrCommandTimeout;
         let accData;
         let reconnectIntervalHandle;
 
@@ -201,8 +201,10 @@ module.exports = function (RED) {
                 if (event.type == EVENT_TYPE_EXECUTE_COMMAND) {
                     setState(CONNECTION_STATE_EXECUTING_COMMAND, event.arg.callback);
                     socket.write(event.arg.command + "\n", 'utf8', function () {
-                        event.arg.callback(null);
-                        setState(CONNECTION_STATE_CONNECTED);
+                        queryOrCommandTimeout = setTimeout(() => {
+                            event.arg.callback(null);
+                            setState(CONNECTION_STATE_CONNECTED);
+                        }, 10);
                     });
                     return;
                 }
@@ -210,7 +212,7 @@ module.exports = function (RED) {
                 if (event.type == EVENT_TYPE_EXECUTE_QUERY) {
                     setState(CONNECTION_STATE_EXECUTING_QUERY, event.arg.callback);
                     socket.write(event.arg.query + "\n", 'utf8');
-                    queryTimeout = setTimeout(function () {
+                    queryOrCommandTimeout = setTimeout(function () {
                         RED.log.error(`[${node.name}] query timeout`);
                         event.arg.callback("timeout");
                         setState(CONNECTION_STATE_CONNECTED);
@@ -240,23 +242,10 @@ module.exports = function (RED) {
             }
 
             if (state == CONNECTION_STATE_EXECUTING_COMMAND) {
-                if (event.type == EVENT_TYPE_DISCONNECT) {
-                    stateCallback("interrupted");
-                    setState(CONNECTION_STATE_DISCONNECTING, event.arg.callback);
-                    socket.destroy();
-                    return;
-                }
-
-                if (event.type == EVENT_TYPE_ON_SOCKET_CLOSE) {
-                    stateCallback("interrupted");
-                    socketCleanup();
-                    return;
-                }
-            }
-
-            if (state == CONNECTION_STATE_EXECUTING_QUERY) {
                 if (event.type == EVENT_TYPE_ON_SOCKET_DATA) {
                     accData += event.arg.toString();
+
+                    let error = false;
 
                     while (true) {
                         let i = accData.indexOf("\r\n");
@@ -267,7 +256,52 @@ module.exports = function (RED) {
                         if (data.startsWith("**ERROR")) {
                             RED.log.error(`[${node.name}] error: '${data}'`);
                             accData = accData.substr(i + 2);
-                        } else {
+                            error = true;
+                        }
+                    }
+
+                    if (error) {
+                        stateCallback("error");
+                        clearTimeout(queryOrCommandTimeout);
+                        setState(CONNECTION_STATE_CONNECTED);
+                    }
+
+                    return;
+                }
+
+                if (event.type == EVENT_TYPE_DISCONNECT) {
+                    clearTimeout(queryOrCommandTimeout);
+                    stateCallback("interrupted");
+                    setState(CONNECTION_STATE_DISCONNECTING, event.arg.callback);
+                    socket.destroy();
+                    return;
+                }
+
+                if (event.type == EVENT_TYPE_ON_SOCKET_CLOSE) {
+                    clearTimeout(queryOrCommandTimeout);
+                    stateCallback("interrupted");
+                    socketCleanup();
+                    return;
+                }
+            }
+
+            if (state == CONNECTION_STATE_EXECUTING_QUERY) {
+                if (event.type == EVENT_TYPE_ON_SOCKET_DATA) {
+                    accData += event.arg.toString();
+
+                    let error = false;
+
+                    while (true) {
+                        let i = accData.indexOf("\r\n");
+                        if (i == -1) {
+                            break;
+                        }
+                        let data = accData.substr(0, i);
+                        if (data.startsWith("**ERROR")) {
+                            RED.log.error(`[${node.name}] error: '${data}'`);
+                            accData = accData.substr(i + 2);
+                            error = true;
+                        } else if (!error) {
                             let num = Number(data);
                             if (!isNaN(num)) {
                                 RED.log.info(`[${node.name}] query result: ${num}`);
@@ -279,17 +313,23 @@ module.exports = function (RED) {
                                 RED.log.info(`[${node.name}] query result: "${data}"`);
                                 stateCallback(null, data);
                             }
-                            clearTimeout(queryTimeout);
+                            clearTimeout(queryOrCommandTimeout);
                             setState(CONNECTION_STATE_CONNECTED);
                             break;
                         }
+                    }
+
+                    if (error) {
+                        stateCallback("error");
+                        clearTimeout(queryOrCommandTimeout);
+                        setState(CONNECTION_STATE_CONNECTED);
                     }
 
                     return;
                 }
 
                 if (event.type == EVENT_TYPE_DISCONNECT) {
-                    clearTimeout(queryTimeout);
+                    clearTimeout(queryOrCommandTimeout);
                     stateCallback("interrupted");
                     setState(CONNECTION_STATE_DISCONNECTING, event.arg.callback);
                     socket.destroy();
@@ -297,7 +337,7 @@ module.exports = function (RED) {
                 }
 
                 if (event.type == EVENT_TYPE_ON_SOCKET_CLOSE) {
-                    clearTimeout(queryTimeout);
+                    clearTimeout(queryOrCommandTimeout);
                     stateCallback("interrupted");
                     socketCleanup();
                     return;
