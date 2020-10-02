@@ -7,7 +7,7 @@ A [Node-RED](http://nodered.org) nodes to work with [EEZ BB3](https://www.envox.
 To install - either use the manage palette option in the editor, or change to your Node-RED user directory.
 
         cd ~/.node-red
-        npm install node-red-contrib-bb3
+        npm install @eez-open/node-red-contrib-bb3
 
 ## Features
 
