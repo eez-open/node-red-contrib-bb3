@@ -1,6 +1,6 @@
 {
   "name": "@eez-open/node-red-contrib-bb3",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Node-RED nodes to talk to EEZ BB3",
   "dependencies": {},
   "repository": {
