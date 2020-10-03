@@ -344,6 +344,12 @@ module.exports = function (RED) {
                 }
             }
 
+            if (event.type == EVENT_TYPE_ON_SOCKET_ERROR) {
+                RED.log.error(`socket error: ${event.arg.err}`);
+                socketCleanup();
+                return;
+            }
+
             RED.log.error(`[${node.name}] event '${event.type}' not handled in state '${state}'`);
             if (event.arg && event.arg.callback) {
                 event.arg.callback("invalid state")
@@ -473,15 +479,23 @@ module.exports = function (RED) {
         node.connection = RED.nodes.getNode(config.connection);
 
         node.on("input", function (msg, send, done) {
-            node.connection.bb3Connect(makeCallback(msg, send, done));
+            node.connection.bb3Connect();
         });
 
         function onConnectionStateChange(arg) {
-            node.status({
-                fill: arg.newState == CONNECTION_STATE_CONNECTED ? "green" : arg.newState != CONNECTION_STATE_DISCONNECTED ? "blue" : "red",
-                shape: "ring",
-                text: arg.newState
-            });
+            if (arg.oldState == CONNECTION_STATE_CONNECTING && arg.newState == CONNECTION_STATE_CONNECTED) {
+                node.status({
+                    fill: "green",
+                    shape: "ring",
+                    text: arg.newState
+                });
+            } else if (arg.newState == CONNECTION_STATE_DISCONNECTING || arg.newState == CONNECTION_STATE_DISCONNECTED) {
+                node.status({
+                    fill: "red",
+                    shape: "ring",
+                    text: arg.newState
+                });
+            }
         }
 
         node.connection.bb3ConnectionEventEmitter.on('state-change', onConnectionStateChange);
@@ -506,7 +520,7 @@ module.exports = function (RED) {
         node.connection = RED.nodes.getNode(config.connection);
 
         node.on("input", function (msg, send, done) {
-            node.connection.bb3Disconnect(makeCallback(msg, send, done));
+            node.connection.bb3Disconnect();
         });
     }
     RED.nodes.registerType("bb3-disconnect", DisconnectNode);
