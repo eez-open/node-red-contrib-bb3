@@ -140,7 +140,9 @@ module.exports = function (RED) {
 
                 if (event.type == EVENT_TYPE_DISCONNECT) {
                     // DO NOTHING
-                    event.arg.callback(null);
+                    if (event.arg && event.arg.callback) {
+                        event.arg.callback(null);
+                    }
                     return;
                 }
             }
@@ -183,7 +185,9 @@ module.exports = function (RED) {
             if (state == CONNECTION_STATE_CONNECTED) {
                 if (event.type == EVENT_TYPE_CONNECT) {
                     // DO NOTHING
-                    event.arg.callback(null);
+                    if (event.arg && event.arg.callback) {
+                        event.arg.callback(null);
+                    }
                     return;
                 }
 
@@ -202,7 +206,9 @@ module.exports = function (RED) {
                     setState(CONNECTION_STATE_EXECUTING_COMMAND, event.arg.callback);
                     socket.write(event.arg.command + "\n", 'utf8', function () {
                         queryOrCommandTimeout = setTimeout(() => {
-                            event.arg.callback(null);
+                            if (event.arg && event.arg.callback) {
+                                event.arg.callback(null);
+                            }
                             setState(CONNECTION_STATE_CONNECTED);
                         }, 10);
                     });
@@ -214,7 +220,9 @@ module.exports = function (RED) {
                     socket.write(event.arg.query + "\n", 'utf8');
                     queryOrCommandTimeout = setTimeout(function () {
                         RED.log.error(`[${node.name}] query timeout`);
-                        event.arg.callback("timeout");
+                        if (event.arg && event.arg.callback) {
+                            event.arg.callback("timeout");
+                        }
                         setState(CONNECTION_STATE_CONNECTED);
                     }, QUERY_TIMEOUT);
                     return;
@@ -253,6 +261,7 @@ module.exports = function (RED) {
                             break;
                         }
                         let data = accData.substr(0, i);
+                        accData = accData.substr(i + 2)
                         if (data.startsWith("**ERROR")) {
                             RED.log.error(`[${node.name}] error: '${data}'`);
                             accData = accData.substr(i + 2);
