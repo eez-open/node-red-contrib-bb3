@@ -56,7 +56,9 @@
         color: "#3FADB5",
         defaults: {
             name: { value: "" },
-            connection: { value: "", type: "bb3-connection", required: true },
+            connection: { value: "", type: "bb3-connection", required: false },
+            connectionName: { value: "", required: false },
+            connectionNameType: { value: "str" },
             command: { value: "", required: true },
             commandType: { value: "str" }
         },
@@ -69,11 +71,12 @@
             }
 
             if (this.command) {
-                // var connection = RED.nodes.node(this.connection);
-                // if (connection) {
-                //     return `[${connection.name}] ${this.command}`;
-                // }
-                return this.command;
+                var connection = RED.nodes.node(this.connection);
+                if (connection) {
+                    return `[${connection.name}] ${this.command}`;
+                } else {
+                    return `[${this.connectionName}] ${this.command}`;
+                }
             }
 
             return "bb3-command";
@@ -84,6 +87,12 @@
                 types: ["msg", "flow", "global", "str", "jsonata", "env"],
                 typeField: "#node-input-commandType"
             })
+
+            $("#node-input-connectionName").typedInput({
+                default:"str",
+                types: ["msg", "flow", "global", "str", "jsonata", "env"],
+                typeField: "#node-input-connectionNameType"
+            })
         }
     });
 </script>
@@ -92,6 +101,11 @@
     <div class="form-row">
         <label for="node-input-connection">Connection</label>
         <input type="text" id="node-input-connection" placeholder="Connection" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-connectionName">Connection name</label>
+        <input type="text" id="node-input-connectionName" placeholder="Connection name" />
+        <input type="hidden" id="node-input-connectionNameType">
     </div>
     <div class="form-row">
         <label for="node-input-command">Command</label>
@@ -120,7 +134,9 @@
         color: "#87A980",
         defaults: {
             name: { value: "" },
-            connection: { value: "", type: "bb3-connection", required: true },
+            connection: { value: "", type: "bb3-connection", required: false },
+            connectionName: { value: "", required: false },
+            connectionNameType: { value: "str" },
             query: { value: "", required: true },
             queryType: { value: "str" }
         },
@@ -133,16 +149,23 @@
             }
 
             if (this.query) {
-                // var connection = RED.nodes.node(this.connection);
-                // if (connection) {
-                //     return `[${connection.name}] ${this.query}`;
-                // }
-                return this.query;
+                var connection = RED.nodes.node(this.connection);
+                if (connection) {
+                    return `[${connection.name}] ${this.query}`;
+                } else {
+                    return `[${this.connectionName}] ${this.query}`;
+                }
             }
 
             return "bb3-query";
         },
         oneditprepare: function () {
+            $("#node-input-connectionName").typedInput({
+                default:"str",
+                types: ["msg", "flow", "global", "str", "jsonata", "env"],
+                typeField: "#node-input-connectionNameType"
+            })
+
             $("#node-input-query").typedInput({
                 default:"str",
                 types: ["msg", "flow", "global", "str", "jsonata", "env"],
@@ -156,6 +179,11 @@
     <div class="form-row">
         <label for="node-input-connection">Connection</label>
         <input type="text" id="node-input-connection" placeholder="Connection" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-connectionName">Connection name</label>
+        <input type="text" id="node-input-connectionName" placeholder="Connection name" />
+        <input type="hidden" id="node-input-connectionNameType">
     </div>
     <div class="form-row">
         <label for="node-input-query">Query</label>

@@ -1,4 +1,5 @@
 const { stat } = require('fs');
+const { decodeDlog } = require('./dlog_file');
 
 module.exports = function (RED) {
     "use strict";
@@ -7,7 +8,7 @@ module.exports = function (RED) {
     var events = require("events");
 
     const RECONNECT_TIMEOUT = 1000;
-    const QUERY_TIMEOUT = 3000;
+    const QUERY_TIMEOUT = 5000;
 
     const CONNECTION_STATE_DISCONNECTED = "disconnected";
     const CONNECTION_STATE_CONNECTING = "connecting";
@@ -26,6 +27,15 @@ module.exports = function (RED) {
     const EVENT_TYPE_ON_SOCKET_END = "on socket end";
     const EVENT_TYPE_ON_SOCKET_CLOSE = "on socket close";
     const EVENT_TYPE_ON_SOCKET_ERROR = "on socket error";
+
+    function convertBinaryStringToUint8Array(str) {
+        let len = str.length;
+        let array = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            array[i] = str.charCodeAt(i);
+        }
+        return array;
+    }
 
     //
     // BB3 Connection config node
@@ -296,11 +306,34 @@ module.exports = function (RED) {
 
             if (state == CONNECTION_STATE_EXECUTING_QUERY) {
                 if (event.type == EVENT_TYPE_ON_SOCKET_DATA) {
-                    accData += event.arg.toString();
+                    accData += event.arg.toString('binary');
 
                     let error = false;
 
                     while (true) {
+                        if (!error && accData.startsWith('#')) {
+                            if (accData.length > 1) {
+                                let n = parseInt(accData[1]);
+                                if (accData.length >= 2 + n) {
+                                    let fileLength = parseInt(accData.substr(2, n));
+                                    if (accData.length >= 2 + n + fileLength + 2) {
+                                        RED.log.info(`[${node.name}] query result is file of length: ${fileLength}`);
+                                        const fileData = accData.substr(2 + n, fileLength);
+                                        const dlog = decodeDlog(convertBinaryStringToUint8Array(fileData), unit => unit);
+                                        if (dlog) {
+                                            dlog.data = fileData.substr(dlog.dataOffset);
+                                            stateCallback(null, dlog);
+                                        } else {
+                                            stateCallback(null, fileData);
+                                        }
+                                        clearTimeout(queryOrCommandTimeout);
+                                        setState(CONNECTION_STATE_CONNECTED);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+
                         let i = accData.indexOf("\r\n");
                         if (i == -1) {
                             break;
@@ -355,6 +388,7 @@ module.exports = function (RED) {
 
             if (event.type == EVENT_TYPE_ON_SOCKET_ERROR) {
                 RED.log.error(`socket error: ${event.arg.err}`);
+                clearTimeout(queryOrCommandTimeout);
                 socketCleanup();
                 return;
             }
@@ -551,17 +585,33 @@ module.exports = function (RED) {
         return RED.util.evaluateNodeProperty(param, paramType, node, msg);
     }
 
+    function getConnectionNode(node, msg, connection, connectionName, connectionNameType) {
+        let connectionNode = RED.nodes.getNode(connection);
+        if (connectionNode) {
+            return connectionNode;
+        }
+
+        connectionName = evalParam(node, msg, connectionName, connectionNameType)
+        RED.nodes.eachNode(temp => {
+            if (temp.name == connectionName && temp.type == "bb3-connection") {
+                connectionNode = RED.nodes.getNode(temp.id);
+            }
+        });
+
+        return connectionNode;
+    }
+
     function CommandNode(config) {
         RED.nodes.createNode(this, config);
 
         var node = this;
 
-        node.connection = RED.nodes.getNode(config.connection);
         node.command = config.command;
         node.commandType = config.commandType;
 
         node.on("input", function (msg, send, done) {
-            node.connection.bb3ExecuteCommand(evalParam(node, msg, node.command, node.commandType), makeCallback(msg, send, done));
+            const connectionNode = getConnectionNode(node, msg, config.connection, config.connectionName, config.connectionNameType);
+            connectionNode.bb3ExecuteCommand(evalParam(node, msg, node.command, node.commandType), makeCallback(msg, send, done));
         });
     }
 
@@ -576,12 +626,12 @@ module.exports = function (RED) {
 
         var node = this;
 
-        node.connection = RED.nodes.getNode(config.connection);
         node.query = config.query;
         node.queryType = config.queryType || "str";
 
         node.on("input", function (msg, send, done) {
-            node.connection.bb3ExecuteQuery(evalParam(node, msg, node.query, node.queryType), makeCallback(msg, send, done));
+            const connectionNode = getConnectionNode(node, msg, config.connection, config.connectionName, config.connectionNameType);
+            connectionNode.bb3ExecuteQuery(evalParam(node, msg, node.query, node.queryType), makeCallback(msg, send, done));
         });
     }
     RED.nodes.registerType("bb3-query", QueryNode);
